@@ -30,49 +30,45 @@ date_default_timezone_set('Asia/Tokyo');
 $id = $_GET['id'];  //URLのパラメータを取得
 $title = $_GET['title'];    //URLのパラメータを取得
 $text = $_GET['text'];  //URLのパラメータを取得
-$fail = 'coment.txt';   //保存するファイル名
 $subId = uniqid();  //コメントに番号を振り分ける
 $date = date("Y年m月d日 H時i分s秒");
-$coment = $_POST['coment'];
+$comment = $_POST['comment'];
 
 
 $error_message = [];
-$limit_coment = 50;
+$limit_comment = 50;
 
 // メイン画面のタイトル内容の取得
 $mysqli = new mysqli('localhost', 'root', 'root', 'lalavel-news');
-
+// テーブルboardの中身を取得して変数に入れる
 $sql = "SELECT * FROM board";
 
-$board = $mysqli->query($sql);
+$board = $mysqli -> query($sql);
 
 //コメントを取得
 $sql = "SELECT * FROM comment_board";
 
-$comment_board= $mysqli->query($sql);
+$comment_board = $mysqli->query($sql);
 
 
-
-
-
-
-if(mb_strlen($coment) >= $limit_coment) $error_message[] = '50文字以内でコメントを書いてください';
-
+if(mb_strlen($comment) >= $limit_comment) $error_message[] = '50文字以内でコメントを書いてください';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if(empty($error_message)) {
 
-        if(!empty($coment)) {
+        if(!empty($comment)) {
 
             if($mysqli->connect_errno) {
+
                 echo $mysqli->connect_errno.':'. $mysqli->connect_errno;
+
             };
 
             $mysqli->connect_errno;
 
-            $sql = "INSERT INTO `comment_board`( `comment`, `main_id`) VALUES ('$coment', $id)";
+            $sql = "INSERT INTO `comment_board`( `comment`, `main_id`) VALUES('$comment', '$id')";
 
             $res = $mysqli->query($sql);
 
@@ -80,30 +76,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $mysqli->close();
 
-            header("Location:" . $_SERVER['REQUEST_URI']);
+            header ("Location:" . $_SERVER['REQUEST_URI']);
+
 			exit;
 
           // 消去ボタンが押されたら起動する
-        } else if(isset($_POST['del'])) {
+        } else if (isset($_POST['del'])) {
 
-                    $sql = "DELETE FROM comment_board WHERE id = {$_POST[del]}";
+            $sql = "DELETE FROM comment_board WHERE id =" . $_POST['del'];
 
-                    $res = $mysqli->query($sql);
+            $res = $mysqli->query($sql);
 
-                    $mysqli->close();
-            };
-
-
-
+            $mysqli->close();
 
             header("Location:" . $_SERVER['REQUEST_URI']);
-			exit;
+
+            exit;
 
         } else {
 
-            if(empty($coment)) $error_message[] = "コメントを記入してください";
+            if(empty($comment)) $error_message[] = "コメントを記入してください";
 
         };
+
+    };
 
 };
 
@@ -128,10 +124,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </h1>
 
     <?php foreach($board as $value) :?>
+
         <?php if($id === $value["id"]) :?>
-            <p><?php echo $value['title'] ?></p>
-            <p><?php echo $value['txt'] ?></p>
+
+            <p>
+                <?php echo $value['title'] ?>
+            </p>
+
+            <p>
+                <?php echo $value['txt'] ?>
+            </p>
+
         <?php endif ?>
+
     <?php endforeach ?>
 
 
@@ -143,15 +148,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	<?php endforeach ?>
 
-
-
+<!-- ここからコメントの書き込み送信表示 -->
 <hr>
     <form action="" method="post" >
 
      	<div>
 
-     		<label for="coment">コメント：</label>
-     		<textarea name="coment" id="coment" cols="20" rows="5"></textarea>
+     		<label for="comment">コメント：</label>
+
+     		<textarea name="comment" id="comment" cols="20" rows="5"></textarea>
 
      	</div>
 
@@ -159,26 +164,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     </form>
 
-    <form action="" method = "post" onsubmit ="return confirm_test()" >
 
+    <?php foreach($comment_board as $comment_kye) :?>
 
-
-         <?php foreach($comment_board as $comment_kye) :?>
+        <form action="" method = "post" onsubmit ="return confirm_test()" >
 
             <?php if($id === $comment_kye['main_id'] ) :?>
 
                 <p>
-                    <?php echo $comment_kye['comment']; echo $comment_kye['id']?>
+                    <?php echo $comment_kye['comment']?>
                 </p>
 
                 <input type = "hidden" name = "del" value = "<?php echo $comment_kye['id'] ?>">
-                <input class = "btn" type="submit" value = "消去">
+
+                <input class = "btn" type = "submit" value = "消去">
 
             <?php endif?>
 
+        </form>
+
+    <?php endforeach ?>
+
+
+    <!-- <form action="" method = "post" onsubmit ="return confirm_test()" >
+         <?php foreach($comment_board as $comment_kye) :?>
+            <?php if($id === $comment_kye['main_id'] ) :?>
+                <p>
+                    <?php echo $comment_kye['comment']; echo $comment_kye['id']; ?>
+                    <input type="hidden" name="del" value="<?php echo $comment_kye['id']; ?>">
+                </p>
+                <input class = "btn" type="submit" value = "消去">
+            <?php endif ?>
         <?php endforeach ?>
 
+    </form> -->
+
+    <!-- <?php foreach($comment_board as $comment_kye) :?>
+    <form action="" method = "post" onsubmit ="return confirm_test()" >
+        <?php if($id === $comment_kye['main_id'] ) :?>
+            <p>
+                <?php echo $comment_kye['comment']; echo $comment_kye['id']; ?>
+            </p>
+            <input type="hidden" name="del" value="<?php echo $comment_kye['id']; ?>">
+            <input class = "btn" type="submit" value = "消去">
+        <?php endif ?>
     </form>
+    <?php endforeach ?> -->
 
 
 
