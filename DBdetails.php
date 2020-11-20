@@ -33,40 +33,38 @@ $text = $_GET['text'];  //URLのパラメータを取得
 $subId = uniqid();  //コメントに番号を振り分ける
 $date = date("Y年m月d日 H時i分s秒");
 $comment = $_POST['comment'];
-
-
 $error_message = [];
 $limit_comment = 50;
 
 // メイン画面のタイトル内容の取得
 $mysqli = new mysqli('localhost', 'root', 'root', 'lalavel-news');
-// テーブルboardの中身を取得して変数に入れる
+
+// テーブルboardを取得する処理を変数に入れる
+// $sqlにMySQLでのsql処理を代入している
+// Q SERECTは何の処理か sql処理とはなんぞや
 $sql = "SELECT * FROM board";
 
+// DB(データベース)に対して$sql処理を実行させている
+// Q query()の役割は何か $mysqli -wo> query($sql);を変数で定義する意味とは
 $board = $mysqli -> query($sql);
 
-//コメントを取得
+// 上記と同じ処理テーブル名が変わっているので取得している内容が違う
 $sql = "SELECT * FROM comment_board";
 
 $comment_board = $mysqli->query($sql);
 
-
 if(mb_strlen($comment) >= $limit_comment) $error_message[] = '50文字以内でコメントを書いてください';
 
-
+// POST通信が行われたときに起動する
+// REQUEST_METHOD→ページにアクセスする際にリクエストされたメソッド(操作のこと寝る食べる)名を返す
+// REQUEST_METHOD→現在されたページがリクエストされたメソッ
+// だから問題です
+// Q POST通信とは何か また書いているコードの内容を分かりやすく話してみ
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if(empty($error_message)) {
 
         if(!empty($comment)) {
-
-            if($mysqli->connect_errno) {
-
-                echo $mysqli->connect_errno.':'. $mysqli->connect_errno;
-
-            };
-
-            $mysqli->connect_errno;
 
             $sql = "INSERT INTO `comment_board`( `comment`, `main_id`) VALUES('$comment', '$id')";
 
@@ -78,11 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             header ("Location:" . $_SERVER['REQUEST_URI']);
 
-			exit;
+            exit;
 
-          // 消去ボタンが押されたら起動する
+        // 消去ボタンが押されたら起動する
         } else if (isset($_POST['del'])) {
 
+            //
             $sql = "DELETE FROM comment_board WHERE id =" . $_POST['del'];
 
             $res = $mysqli->query($sql);

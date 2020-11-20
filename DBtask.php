@@ -4,22 +4,6 @@
 date_default_timezone_set('Asia/Tokyo');
 
 
-$user = 'root';
-$password = 'root';
-$db = 'inventory';
-$host = 'localhost';
-$port = 3306;
-
-$link = mysqli_init();
-$success = mysqli_real_connect(
-   $link,
-   $host,
-   $user,
-   $password,
-   $db,
-   $port
-);
-
 
 
 try {
@@ -68,14 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 		//両方空でなければ起動する
 		if(!empty($title) && !empty($text)) {
 
-
-
-			if($mysqli->connect_errno ) {
-				echo $mysqli->connect_errno . ' : ' . $mysqli->connect_error;
-			}
-
 			$mysqli->set_charset('utf8');
-
 
 			// INSERT
 			$sql = "INSERT INTO `board`( `title`, `txt`) VALUES ('$title','$text')";
@@ -83,14 +60,17 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 			$res = $mysqli->query($sql);
 
 			var_dump($res);
+
 			$mysqli->close();
 
 			header('Location:'.$_SERVER["SCRIPT_NAME"]);
+
 			exit;
 
 		  } else {
 
-    		if(empty($_POST['title'])) $error_message[] = 'タイトルを入力してください';
+			if(empty($_POST['title'])) $error_message[] = 'タイトルを入力してください';
+
 			if(empty($_POST['txt'])) $error_message[] = '記事を入力してください';
 
 		};
@@ -113,21 +93,29 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 <body>
 
 	<?php foreach($error_message as $value): ?>
+
 		<p>
 			<?php echo $value ?>
 		</p>
+
 	<?php endforeach ?>
 
 	<form action="" method="post" onsubmit="return confirm_test()">
 
     	<div>
+
      		<label for="title">タイトル</label>
+
         	<input id="title" type="text" name="title" value="">
+
     	</div>
 
     	<div>
+
      		<label for="contents">記事の内容</label>
+
      		<textarea name="txt" id="contents" cols="30" rows="10"></textarea>
+
     	</div>
 
     	<input class="btn" type="submit" name="btn_submit" value="送信">
@@ -137,9 +125,19 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 <hr>
 
 	<?php foreach($BOARD as $value) :?>
-	<p><?php echo $value['title']?></p>
-	<p><?php echo $value['txt']?></p>
-	<p><a href="http://localhost/DB/DBdetails.php/?id=<?php echo $value['id'] ?>">明細ページ</a></p>
+
+		<p>
+			<?php echo $value['title']?>
+		</p>
+
+		<p>
+			<?php echo $value['txt']?>
+		</p>
+
+		<p>
+			<a href="http://localhost/DB/DBdetails.php/?id=<?php echo $value['id'] ?>">明細ページ</a>
+		</p>
+
 	<?php endforeach ?>
 
 <script src="js.js"></script>
