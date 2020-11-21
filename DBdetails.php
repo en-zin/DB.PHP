@@ -19,7 +19,7 @@ $success = mysqli_real_connect(
 
 
 try {
-    $db = new PDO('mysql:dbname=lalavel-news;host=localhost;charset=utf8','root','root');
+    $db = new PDO('mysql:dbname=laravel-news;host=localhost;charset=utf8','root','root');
     echo '接続OK';
 } catch(PDOException $e) {
     echo 'Dエラー:' . $e->getMessage();
@@ -28,16 +28,15 @@ try {
 date_default_timezone_set('Asia/Tokyo');
 
 $id = $_GET['id'];  //URLのパラメータを取得
-$title = $_GET['title'];    //URLのパラメータを取得
-$text = $_GET['text'];  //URLのパラメータを取得
-$subId = uniqid();  //コメントに番号を振り分ける
+$data = [];
+$comment_board = [];
 $date = date("Y年m月d日 H時i分s秒");
 $comment = $_POST['comment'];
 $error_message = [];
 $limit_comment = 50;
 
 // メイン画面のタイトル内容の取得
-$mysqli = new mysqli('localhost', 'root', 'root', 'lalavel-news');
+$mysqli = new mysqli('localhost', 'root', 'root', 'laravel-news');
 
 // テーブルboardを取得する処理を変数に入れる
 // $sqlにMySQLでのsql処理を代入している
@@ -51,7 +50,13 @@ $board = $mysqli -> query($sql);
 // 上記と同じ処理テーブル名が変わっているので取得している内容が違う
 $sql = "SELECT * FROM comment_board";
 
-$comment_board = $mysqli->query($sql);
+$data = $mysqli->query($sql);
+
+while($row = $data->fetch_assoc()) {
+
+    $comment_board[] = $row;
+
+}
 
 if(mb_strlen($comment) >= $limit_comment) $error_message[] = '50文字以内でコメントを書いてください';
 
@@ -66,11 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if(!empty($comment)) {
 
+            //  mysqlのinsert文を書いている状態 この時カラム内の型と違うとinsertされない
             $sql = "INSERT INTO `comment_board`( `comment`, `main_id`) VALUES('$comment', '$id')";
 
+            // la
             $res = $mysqli->query($sql);
-
-            var_dump($res);
 
             $mysqli->close();
 
@@ -101,9 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     };
 
 };
-
-
-
 
 ?>
 
@@ -164,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
 
-    <?php foreach($comment_board as $comment_kye) :?>
+    <?php foreach(array_reverse($comment_board) as $comment_kye) :?>
 
         <form action="" method = "post" onsubmit ="return confirm_test()" >
 

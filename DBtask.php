@@ -7,7 +7,7 @@ date_default_timezone_set('Asia/Tokyo');
 
 
 try {
-    $db = new PDO('mysql:dbname=lalavel-news;host=localhost;charset=utf8','root','root');
+    $db = new PDO('mysql:dbname=laravel-news;host=localhost;charset=utf8','root','root');
     echo '接続OK';
 } catch(PDOException $e) {
     echo 'Dエラー:' . $e->getMessage();
@@ -17,25 +17,30 @@ try {
 
 
 // $Fail = 'message.txt';	//ファイルのパスを指定してあげる
-$id = uniqid();	//ランダムなIDを生成
-$date = date("Y年m月d日 H時i分s秒");	//現在時刻の生成
+$date = date("Y-m-d- H:i:s");	//現在時刻の生成
 $title = $_POST['title'];	//titleを引っ張ってくる
 $text = $_POST['txt'];	//txtを引っ張ってくる
-$DATA = [];	//.txtに配列として書き込むための変数
-$BOARD = [];	//$DATAを配列の中に封じ込める
+$data = []; //ボードから持ってきた情報をいったん保存する
+$board = []; // 配列の配列として保存するための変数
 
 $error_message = [];	//エラーメッセージを格納する
 $limit_title = 10; //文字数制限
 $limit_text = 50;	//文字数制限
 
 
-$mysqli = new mysqli( 'localhost', 'root', 'root','lalavel-news');
+$mysqli = new mysqli( 'localhost', 'root', 'root','laravel-news');
 
 $sql = "SELECT * FROM board";
 
-$BOARD = $mysqli->query($sql);
+$data = $mysqli->query($sql);
 
+// $dataで取得してきたデータを一つ一つ配列にして $rowにいれている
+// $boardの配列のなかに保存する  [[]]こんな状態
+while($row = $data->fetch_assoc()) {
 
+	$board[] = $row;
+
+};
 
 //文字が多いと起動
 if(mb_strlen($title) >= $limit_title)  $error_message[] = 'タイトルは10文字以内でお願いします';
@@ -124,7 +129,8 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 
 <hr>
 
-	<?php foreach($BOARD as $value) :?>
+
+	<?php foreach(array_reverse($board) as $value):?>
 
 		<p>
 			<?php echo $value['title']?>
