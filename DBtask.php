@@ -5,7 +5,7 @@ date_default_timezone_set('Asia/Tokyo');
 
 
 
-
+//今回使ってないけどpdoでの接続
 try {
     $db = new PDO('mysql:dbname=laravel-news;host=localhost;charset=utf8','root','root');
     echo '接続OK';
@@ -36,6 +36,8 @@ $data = $mysqli->query($sql);
 
 // $dataで取得してきたデータを一つ一つ配列にして $rowにいれている
 // $boardの配列のなかに保存する  [[]]こんな状態
+// $rowに関しては特にいみがない
+// Q 素の$dataだとどんな状態なのか... まじでわかってないので調べる必要があるかも
 while($row = $data->fetch_assoc()) {
 
 	$board[] = $row;
