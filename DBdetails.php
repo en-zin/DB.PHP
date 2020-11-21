@@ -18,12 +18,7 @@ $success = mysqli_real_connect(
 
 
 //今回使ってないけどpdoでの接続
-try {
-    $db = new PDO('mysql:dbname=laravel-news;host=localhost;charset=utf8','root','root');
-    echo '接続OK';
-} catch(PDOException $e) {
-    echo 'Dエラー:' . $e->getMessage();
-};
+
 
 date_default_timezone_set('Asia/Tokyo');
 
@@ -211,8 +206,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif ?>
     </form>
     <?php endforeach ?> -->
-
-
 
 
 <script src="js.js"></script>
