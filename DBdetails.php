@@ -23,9 +23,9 @@ $success = mysqli_real_connect(
 date_default_timezone_set('Asia/Tokyo');
 
 $id = $_GET['id'];  //URLのパラメータを取得
-$data = [];
+$data = [];// sqlして取得してきた
 $comment_board = [];
-$date = date("Y年m月d日 H時i分s秒");
+$date = date("Y-m-d H:i:s");
 $comment = $_POST['comment'];
 $error_message = [];
 $limit_comment = 50;
@@ -35,15 +35,15 @@ $mysqli = new mysqli('localhost', 'root', 'root', 'laravel-news');
 
 // テーブルboardを取得する処理を変数に入れる
 // $sqlにMySQLでのsql処理を代入している
-// Q SERECTは何の処理か sql処理とはなんぞや
-$sql = "SELECT * FROM board";
+// Q SERECTは何の処理か sql処理とはなんぞや WHEREもじゅうようだぞ！
+$sql = "SELECT * FROM board WHERE id = $id";
 
 // DB(データベース)に対して$sql処理を実行させている
 // Q query()の役割は何か $mysqli -wo> query($sql);を変数で定義する意味とは
 $board = $mysqli -> query($sql);
 
 // 上記と同じ処理テーブル名が変わっているので取得している内容が違う
-$sql = "SELECT * FROM comment_board";
+$sql = "SELECT * FROM comment_board ORDER BY id DESC";
 
 $data = $mysqli->query($sql);
 
@@ -51,7 +51,7 @@ while($row = $data->fetch_assoc()) {
 
     $comment_board[] = $row;
 
-}
+};
 
 if(mb_strlen($comment) >= $limit_comment) $error_message[] = '50文字以内でコメントを書いてください';
 
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if(!empty($comment)) {
 
             //  mysqlのinsert文を書いている状態 この時カラム内の型と違うとinsertされない
-            $sql = "INSERT INTO `comment_board`( `comment`, `main_id`) VALUES('$comment', '$id')";
+            $sql = "INSERT INTO `comment_board`( `comment`, `main_id`, `date`) VALUES('$comment', '$id', '$date')";
 
             // la
             $res = $mysqli->query($sql);
@@ -121,8 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php foreach($board as $value) :?>
 
-        <?php if($id === $value["id"]) :?>
-
             <p>
                 <?php echo $value['title'] ?>
             </p>
@@ -130,8 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>
                 <?php echo $value['txt'] ?>
             </p>
-
-        <?php endif ?>
 
     <?php endforeach ?>
 
@@ -146,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!-- ここからコメントの書き込み送信表示 -->
 <hr>
-    <form action="" method="post" >
+    <form action="" method="post" onsubmit="return confirm_test()">
 
      	<div>
 
@@ -161,11 +157,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
 
-    <?php foreach(array_reverse($comment_board) as $comment_kye) :?>
+    <?php foreach($comment_board as $comment_kye) :?>
 
-        <form action="" method = "post" onsubmit ="return confirm_test()" >
+        <form action="" method = "post">
 
             <?php if($id === $comment_kye['main_id'] ) :?>
+
+                <p>
+                    <?php echo $comment_kye['date'] ?>
+                </p>
 
                 <p>
                     <?php echo $comment_kye['comment']?>
@@ -208,6 +208,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endforeach ?> -->
 
 
-<script src="js.js"></script>
+<script src = "js.js"></script>
+<script>
+function confirm_test() {
+	let select = confirm(
+		"投稿しますか"
+	);
+	return select;
+};
+</script>
 </body>
 </html>
