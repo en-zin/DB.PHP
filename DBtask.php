@@ -32,7 +32,7 @@ try {
 
 
 // $Fail = 'message.txt';	//ファイルのパスを指定してあげる
-$date = date("Y-m-d- H:i:s");	//現在時刻の生成
+$date = date("Y-m-d H:i:s");	//現在時刻の生成
 $title = $_POST['title'];	//titleを引っ張ってくる
 $text = $_POST['txt'];	//txtを引っ張ってくる
 $data = []; //ボードから持ってきた情報をいったん保存する
@@ -45,7 +45,7 @@ $limit_text = 50;	//文字数制限
 
 $mysqli = new mysqli( 'localhost', 'root', 'root','laravel-news');
 
-$sql = "SELECT * FROM board";
+$sql = "SELECT * FROM board id ORDER BY id DESC";
 
 $data = $mysqli->query($sql);
 
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 			$mysqli->set_charset('utf8');
 
 			// INSERT
-			$sql = "INSERT INTO `board`( `title`, `txt`) VALUES ('$title','$text')";
+			$sql = "INSERT INTO `board`( `title`, `txt`,`date`) VALUES ('$title','$text','$date')";
 
 			$res = $mysqli->query($sql);
 
@@ -147,7 +147,11 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 <hr>
 
 
-	<?php foreach(array_reverse($board) as $value):?>
+	<?php foreach($board as $value):?>
+
+		<p>
+			<?php echo $value['date'] ?>
+		</p>
 
 		<p>
 			<?php echo $value['title']?>
@@ -163,6 +167,6 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') {
 
 	<?php endforeach ?>
 
-<script src="js.js"></script>
+<script src = "js.js"></script>
 </body>
 </html>
